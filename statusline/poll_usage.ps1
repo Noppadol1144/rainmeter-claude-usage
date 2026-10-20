@@ -39,7 +39,7 @@ $CredFile = "$env:USERPROFILE\.claude\.credentials.json"
 # Set to $false to disable the automatic `claude -p` refresh-on-401 and
 # just report STATUS=EXPIRED instead (no extra API usage, but you have to
 # manually run `claude` yourself to fix it).
-$AutoRefreshOnExpiry = $false
+$AutoRefreshOnExpiry = $true
 $RefreshTimeoutSeconds = 30
 
 function Get-AccessToken {

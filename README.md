@@ -38,36 +38,23 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Install.ps1 -Backgroun
 
 Clicking the skin also runs the poller, even without a scheduled task. Avoid repeated clicks during rate limiting. If the task already exists, Windows permissions may require an elevated shell to update it.
 
-Automatic token renewal is **disabled by default**. Without it, run Claude Code yourself when credentials expire and sign in again if prompted.
+### Automatic token renewal
 
-### Optional: enable automatic token renewal
+Automatic token renewal is **enabled by default** (`$AutoRefreshOnExpiry = $true` in `statusline/poll_usage.ps1`), matching the original widget.
 
-This option runs `claude -p ok` after an HTTP 401 response. **It sends a real prompt and consumes your Claude usage.** It attempts renewal once and retries the usage request once; it cannot replace an interactive sign-in when one is required.
+After an HTTP 401 response, the poller runs `claude -p ok` once to let Claude Code renew its credentials, then retries the usage request once if renewal succeeds. **This sends a real prompt and consumes your Claude usage.** Successful ordinary usage checks do not send a renewal prompt.
 
-1. Install Claude Code, run `claude`, and complete your first sign-in manually. Automatic renewal does not create an account or perform the initial login.
-2. For unattended updates, enable the 15-minute background task from the repository directory:
+Run `claude` and complete the initial sign-in yourself before using the widget. If renewal fails or `skin/usage_status.txt` reports `STATUS=EXPIRED`, open `claude` manually and sign in again if prompted.
 
-   ```powershell
-   powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Install.ps1 -BackgroundPolling
-   ```
+For unattended updates, enable the 15-minute background task using the `-BackgroundPolling` installation command above. Automatic renewal does not schedule checks by itself.
 
-3. Open `statusline/poll_usage.ps1` in the repository directory that you installed from. Change:
+To disable renewal prompts, open `statusline/poll_usage.ps1` in the repository directory you installed from and set:
 
-   ```powershell
-   $AutoRefreshOnExpiry = $false
-   ```
+```powershell
+$AutoRefreshOnExpiry = $false
+```
 
-   to:
-
-   ```powershell
-   $AutoRefreshOnExpiry = $true
-   ```
-
-4. Save the file. The next poll uses this setting; reinstalling the skin is not necessary. Click the widget to request a check, or wait for the scheduled task. A successful ordinary check does not run a renewal prompt: the renewal path is triggered only by HTTP 401.
-
-To disable automatic renewal, set `$AutoRefreshOnExpiry` back to `$false`. Background usage checks continue without sending renewal prompts. If `skin/usage_status.txt` reports `STATUS=EXPIRED`, open `claude` manually, sign in if requested, and retry. Enabling renewal alone does not schedule checks; the background task above is what runs them while you are away from Claude Code.
-
-The setting is a local edit to a tracked script. Review it after updating the repository; Git may ask you to resolve a conflicting change.
+Save the file; the next poll uses the setting without reinstalling the skin. Background usage checks continue, but you must renew credentials manually when they expire. Review this local setting after repository updates.
 
 The reset countdown is calculated when a collector writes data; it is not a continuously ticking clock. If no source returns data, the displayed figures can remain stale. Check `UPDATED`, `STATUS`, and `NOTE` in `skin/usage_status.txt`; the decorative status dot does not certify freshness.
 

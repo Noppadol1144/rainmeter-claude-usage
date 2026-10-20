@@ -1,0 +1,15 @@
+# Written by the scripts at runtime -- never commit
+skin/usage_status.txt
+statusline/poll_state.json
+statusline/debug_last_response.json
+
+# Regenerated per machine by install_poll_task.ps1
+statusline/run_poll_hidden.vbs
+
+# Local backups and scratch
+*.bak*
+Claude outputs/
+
+*.tmp
+*.zip
+
